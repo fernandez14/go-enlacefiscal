@@ -1,6 +1,9 @@
 package efiscal
 
 import (
+	"github.com/jmcvetta/napping"
+
+	"errors"
 	"time"
 )
 
@@ -12,6 +15,7 @@ type API struct {
 
 const EF_VERSION = "5.0"
 const EF_DECIMALS = 2
+const EF_SERVICE = "https://api.enlacefiscal.com/rest/v1/"
 
 func (module API) Invoice(rfc, series, folio string) *Invoice {
 
@@ -37,9 +41,26 @@ func (module API) Invoice(rfc, series, folio string) *Invoice {
 	return invoice
 }
 
-func (module API) Sign(invoice *Invoice) (interface{}, error) {
+func (module API) Sign(invoice *Invoice) (map[string]interface{}, error) {
+
+	var res Response
 
 	invoice.Prepare()
 
-	return nil, nil
+	url := EF_SERVICE + "comprobantes/emitir"
+	response, err := napping.Post(url, invoice, &res, nil)
+
+	if err != nil {
+		return res.Body, err
+	}
+
+	if response.Status() != 200 {
+		return res.Body, errors.New("EnlaceFiscal invalid response. Did not get http 200")
+	}
+
+	if res.IsError() {
+		return res.Body, res.GetError()
+	}
+
+	return res.Body, nil
 }
