@@ -19,16 +19,16 @@ func (self Response) IsError() bool {
 func (self Response) GetError() error {
 
 	message, exists := self.Body["mensajeError"].(map[string]interface{})
-	ref, re := self.Body["numeroReferencia"].(int)
+	ref, re := self.Body["numeroReferencia"]
 
 	if exists && re {
-		code, ce := message["codigoError"].(string)
+		code, ce := message["codigoError"]
 
 		if ce {
 			description, de := message["descripcionError"].(map[string]interface{})
 
 			if de {
-				text, te := description["texto"].(string)
+				text, te := description["texto"]
 
 				if te {
 
@@ -38,15 +38,15 @@ func (self Response) GetError() error {
 		}
 	}
 
-	return errors.New("Response has no errors on it.")
+	return errors.New(message["codigoError"].(string))
 }
 
 type ResponseError struct {
-	Code        string
-	Reference   int
-	Description string
+	Code        interface{}
+	Reference   interface{}
+	Description interface{}
 }
 
 func (e *ResponseError) Error() string {
-	return fmt.Sprintf("%d - Code: %s - %s", e.Reference, e.Code, e.Description)
+	return fmt.Sprintf("%v - Code: %v - %v", e.Reference, e.Code, e.Description)
 }

@@ -4,6 +4,7 @@ import (
 	"github.com/jmcvetta/napping"
 
 	"errors"
+	"net/url"
 	"time"
 )
 
@@ -26,15 +27,15 @@ func (module API) Invoice(rfc, series, folio string) *Invoice {
 	}
 
 	invoice := &Invoice{
-		mode:      mode,
-		version:   EF_VERSION,
-		subtotal:  0.0,
-		discounts: 0.0,
-		total:     0.0,
-		decimals:  EF_DECIMALS,
+		Mode:      mode,
+		Version:   EF_VERSION,
+		Subtotal:  0.0,
+		Discounts: 0.0,
+		Total:     0.0,
+		Decimals:  EF_DECIMALS,
 		Series:    series,
 		Folio:     folio,
-		Emitted:   time.Now(),
+		Emitted:   JSONTime(time.Now()),
 		RFC:       rfc,
 	}
 
@@ -47,8 +48,18 @@ func (module API) Sign(invoice *Invoice) (map[string]interface{}, error) {
 
 	invoice.Prepare()
 
+	s := napping.Session{
+		Userinfo: url.UserPassword(module.user, module.key),
+	}
+
+	payload := struct {
+		CFDI *Invoice `json:"CFDi"`
+	}{
+		invoice,
+	}
+
 	url := EF_SERVICE + "comprobantes/emitir"
-	response, err := napping.Post(url, invoice, &res, nil)
+	response, err := s.Post(url, &payload, &res, nil)
 
 	if err != nil {
 		return res.Body, err
