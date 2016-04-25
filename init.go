@@ -18,6 +18,11 @@ const EF_VERSION = "5.0"
 const EF_DECIMALS = 2
 const EF_SERVICE = "https://api.enlacefiscal.com/rest/v1/"
 
+func Boot(user, key string, production bool) API {
+	
+	return API{user, key, production}	
+}
+
 func (module API) Invoice(rfc, series, folio string) *Invoice {
 
 	mode := "debug"
