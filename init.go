@@ -19,8 +19,7 @@ const EF_DECIMALS = 2
 const EF_SERVICE = "https://api.enlacefiscal.com/rest/v1/"
 
 func Boot(user, key string, production bool) API {
-	
-	return API{user, key, production}	
+	return API{user, key, production}
 }
 
 func (module API) Invoice(rfc, series, folio string) *Invoice {
@@ -42,6 +41,7 @@ func (module API) Invoice(rfc, series, folio string) *Invoice {
 		Folio:     folio,
 		Emitted:   JSONTime(time.Now()),
 		RFC:       rfc,
+		Referer:   "go-enlacefiscal.v1",
 	}
 
 	return invoice

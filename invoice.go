@@ -16,12 +16,14 @@ type Invoice struct {
 	Folio     string   `json:"folioInterno"`
 	Emitted   JSONTime `json:"fechaEmision"`
 	RFC       string   `json:"rfc"`
+	Referer   string   `json:"softwareIntegrador"`
 
 	// Nested structures
 	Payment  *Payment  `json:"DatosDePago,omitempty"`
 	Receiver *Receiver `json:"Receptor,omitempty"`
 	Items    *Items    `json:"Partidas,omitempty"`
 	Taxes    *Taxes    `json:"Impuestos,omitempty"`
+	MailTo   *MailTo   `json:"EnviarCFDi,omitempty"`
 }
 
 // Sets the current invoice representation payment settings
@@ -32,6 +34,11 @@ func (self *Invoice) SetPayment(v *Payment) {
 // Sets the current invoice representation receiver information (target rfc)
 func (self *Invoice) SetReceiver(v *Receiver) {
 	self.Receiver = v
+}
+
+// Send the invoice to list of mails
+func (self *Invoice) SendMail(list []string) {
+	self.MailTo = &MailTo{List: list}
 }
 
 // Sets the current invoice emitted time
